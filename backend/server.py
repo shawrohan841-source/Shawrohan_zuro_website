@@ -480,12 +480,35 @@ async def remove_from_wishlist(product_id: str, request: Request):
 @api_router.post("/orders/create")
 async def create_order(order: OrderCreate, request: Request):
     user = await get_current_user(request)
+    
+    # Server-side total calculation for security
+    calculated_total = 0
+    for item in order.items:
+        product = await db.products.find_one({"id": item["product_id"]}, {"_id": 0})
+        if not product:
+            raise HTTPException(status_code=404, detail=f"Product {item['product_id']} not found")
+        if product["stock"] < item["quantity"]:
+            raise HTTPException(status_code=400, detail=f"Insufficient stock for {product['name']}")
+        calculated_total += product["price"] * item["quantity"]
+    
+    # Add shipping
+    shipping = 0 if calculated_total > 999 else 99
+    calculated_total += shipping
+    
     order_doc = order.model_dump()
     order_doc["id"] = str(uuid.uuid4())
     order_doc["user_id"] = user["_id"]
     order_doc["status"] = "pending"
+    order_doc["total"] = calculated_total  # Use server-calculated total
     order_doc["created_at"] = datetime.now(timezone.utc).isoformat()
     order_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    # Decrement stock
+    for item in order.items:
+        await db.products.update_one(
+            {"id": item["product_id"]},
+            {"$inc": {"stock": -item["quantity"]}}
+        )
     
     await db.orders.insert_one(order_doc)
     await db.cart.delete_one({"user_id": user["_id"]})
@@ -600,6 +623,12 @@ async def get_all_orders(request: Request, skip: int = 0, limit: int = 50):
 @api_router.put("/admin/orders/{order_id}/status")
 async def update_order_status(order_id: str, status: str, request: Request):
     await get_admin_user(request)
+    
+    # Validate status enum
+    valid_statuses = ["pending", "processing", "shipped", "delivered", "cancelled"]
+    if status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {', '.join(valid_statuses)}")
+    
     result = await db.orders.update_one(
         {"id": order_id},
         {"$set": {"status": status, "updated_at": datetime.now(timezone.utc).isoformat()}}

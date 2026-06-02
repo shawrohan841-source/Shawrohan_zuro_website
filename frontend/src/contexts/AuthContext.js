@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
       const { data } = await axios.get(`${API}/auth/me`, { withCredentials: true });
       setUser(data);
     } catch (error) {
+      // Silently set user to null on 401 (no console.error for unauthenticated state)
       setUser(null);
     } finally {
       setLoading(false);
