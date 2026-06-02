@@ -152,7 +152,13 @@ class ProductCreate(BaseModel):
     category: str
     description: str
     price: float
+class ProductCreate(BaseModel):
+    name: str
+    category: str
+    description: str
+    price: float
     images: List[str]
+    videos: List[str] = []
     sizes: List[str] = ["S", "M", "L", "XL", "XXL"]
     colors: List[str] = ["Black", "White"]
     stock: int = 100
@@ -165,6 +171,7 @@ class ProductResponse(BaseModel):
     description: str
     price: float
     images: List[str]
+    videos: List[str] = []
     sizes: List[str]
     colors: List[str]
     stock: int
@@ -188,6 +195,7 @@ class ReviewCreate(BaseModel):
     product_id: str
     rating: int
     comment: str
+    images: List[str] = []
 
 class CouponValidate(BaseModel):
     code: str
@@ -589,20 +597,134 @@ async def verify_razorpay_payment(payment_id: str, order_id: str, signature: str
 # ==================== REVIEWS ====================
 
 @api_router.get("/reviews/product/{product_id}")
-async def get_reviews(product_id: str):
-    reviews = await db.reviews.find({"product_id": product_id}, {"_id": 0}).to_list(100)
-    return reviews
+async def get_reviews(product_id: str, sort: str = "newest", with_images: bool = False):
+    query = {"product_id": product_id, "approved": {"$ne": False}}
+    if with_images:
+        query["images"] = {"$exists": True, "$ne": []}
+    
+    # Determine sort order
+    sort_options = {
+        "newest": [("created_at", -1)],
+        "oldest": [("created_at", 1)],
+        "highest": [("rating", -1), ("created_at", -1)],
+        "lowest": [("rating", 1), ("created_at", -1)],
+    }
+    sort_order = sort_options.get(sort, [("created_at", -1)])
+    
+    reviews = await db.reviews.find(query, {"_id": 0}).sort(sort_order).to_list(200)
+    
+    # Calculate stats
+    all_reviews = await db.reviews.find({"product_id": product_id, "approved": {"$ne": False}}, {"_id": 0}).to_list(500)
+    total = len(all_reviews)
+    average = sum(r["rating"] for r in all_reviews) / total if total > 0 else 0
+    breakdown = {str(i): 0 for i in range(1, 6)}
+    for r in all_reviews:
+        breakdown[str(r["rating"])] = breakdown.get(str(r["rating"]), 0) + 1
+    
+    return {
+        "reviews": reviews,
+        "stats": {
+            "total": total,
+            "average": round(average, 1),
+            "breakdown": breakdown
+        }
+    }
 
 @api_router.post("/reviews")
 async def create_review(review: ReviewCreate, request: Request):
     user = await get_current_user(request)
+    
+    # Check verified purchase: user must have a delivered or completed order with this product
+    user_orders = await db.orders.find({"user_id": user["_id"]}).to_list(100)
+    verified = False
+    for order in user_orders:
+        for item in order.get("items", []):
+            if item.get("product_id") == review.product_id:
+                verified = True
+                break
+        if verified:
+            break
+    
+    # Check if user already reviewed this product
+    existing = await db.reviews.find_one({"product_id": review.product_id, "user_id": user["_id"]})
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already reviewed this product")
+    
     review_doc = review.model_dump()
     review_doc["id"] = str(uuid.uuid4())
     review_doc["user_id"] = user["_id"]
     review_doc["user_name"] = user["name"]
+    review_doc["user_city"] = user.get("city", "India")
+    review_doc["verified_purchase"] = verified
+    review_doc["approved"] = True  # Auto-approve, admin can moderate later
+    review_doc["featured"] = False
     review_doc["created_at"] = datetime.now(timezone.utc).isoformat()
+    
     await db.reviews.insert_one(review_doc)
-    return {"message": "Review added"}
+    return {"message": "Review added", "verified_purchase": verified}
+
+@api_router.put("/reviews/{review_id}")
+async def update_review(review_id: str, review: ReviewCreate, request: Request):
+    user = await get_current_user(request)
+    
+    existing = await db.reviews.find_one({"id": review_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Review not found")
+    
+    if existing["user_id"] != user["_id"]:
+        raise HTTPException(status_code=403, detail="Cannot edit others' reviews")
+    
+    update_data = {
+        "rating": review.rating,
+        "comment": review.comment,
+        "images": review.images,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.reviews.update_one({"id": review_id}, {"$set": update_data})
+    return {"message": "Review updated"}
+
+@api_router.delete("/reviews/{review_id}")
+async def delete_review(review_id: str, request: Request):
+    user = await get_current_user(request)
+    
+    existing = await db.reviews.find_one({"id": review_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Review not found")
+    
+    # User can delete their own, admin can delete any
+    if existing["user_id"] != user["_id"] and user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Cannot delete others' reviews")
+    
+    await db.reviews.delete_one({"id": review_id})
+    return {"message": "Review deleted"}
+
+# Admin Review Moderation
+@api_router.get("/admin/reviews")
+async def get_admin_reviews(request: Request):
+    await get_admin_user(request)
+    reviews = await db.reviews.find({}, {"_id": 0}).sort([("created_at", -1)]).to_list(500)
+    return reviews
+
+@api_router.put("/admin/reviews/{review_id}/moderate")
+async def moderate_review(review_id: str, action: str, request: Request):
+    await get_admin_user(request)
+    
+    update = {}
+    if action == "approve":
+        update["approved"] = True
+    elif action == "reject":
+        update["approved"] = False
+    elif action == "feature":
+        update["featured"] = True
+    elif action == "unfeature":
+        update["featured"] = False
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action")
+    
+    result = await db.reviews.update_one({"id": review_id}, {"$set": update})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return {"message": f"Review {action}d"}
 
 # ==================== COUPONS ====================
 

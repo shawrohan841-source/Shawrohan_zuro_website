@@ -16,6 +16,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminCoupons from './pages/admin/AdminCoupons';
+import AdminReviews from './pages/admin/AdminReviews';
 import AdminLoginGate from './pages/AdminLoginGate';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
@@ -51,6 +52,7 @@ function App() {
             <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
             <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
             <Route path="/admin/coupons" element={<AdminRoute><AdminCoupons /></AdminRoute>} />
+            <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/refund" element={<RefundPage />} />

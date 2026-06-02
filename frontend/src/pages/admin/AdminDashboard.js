@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../../components/Header';
-import { Package, ShoppingBag, Users, DollarSign, Ticket, LogOut } from 'lucide-react';
+import { Package, ShoppingBag, Users, DollarSign, Ticket, LogOut, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -74,7 +74,7 @@ const AdminDashboard = () => {
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Link to="/admin/products" className="bg-[#111111] border border-white/10 p-8 hover:border-white/30 transition-all hover:-translate-y-1">
                   <ShoppingBag className="w-10 h-10 text-white mb-4" />
                   <h2 className="text-xl uppercase font-bold text-white">MANAGE PRODUCTS</h2>
@@ -89,6 +89,11 @@ const AdminDashboard = () => {
                   <Ticket className="w-10 h-10 text-white mb-4" />
                   <h2 className="text-xl uppercase font-bold text-white">MANAGE COUPONS</h2>
                   <p className="text-[#A1A1AA] text-sm mt-2">Create and manage discount coupons</p>
+                </Link>
+                <Link to="/admin/reviews" className="bg-[#111111] border border-white/10 p-8 hover:border-white/30 transition-all hover:-translate-y-1">
+                  <MessageSquare className="w-10 h-10 text-white mb-4" />
+                  <h2 className="text-xl uppercase font-bold text-white">MODERATE REVIEWS</h2>
+                  <p className="text-[#A1A1AA] text-sm mt-2">Approve, feature, or delete reviews</p>
                 </Link>
               </div>
             </>
