@@ -701,9 +701,10 @@ async def delete_review(review_id: str, request: Request):
 
 # Admin Review Moderation
 @api_router.get("/admin/reviews")
-async def get_admin_reviews(request: Request):
+async def get_admin_reviews(request: Request, skip: int = 0, limit: int = 100):
     await get_admin_user(request)
-    reviews = await db.reviews.find({}, {"_id": 0}).sort([("created_at", -1)]).to_list(500)
+    limit = min(max(limit, 1), 500)
+    reviews = await db.reviews.find({}, {"_id": 0}).sort([("created_at", -1)]).skip(skip).limit(limit).to_list(limit)
     return reviews
 
 @api_router.put("/admin/reviews/{review_id}/moderate")
@@ -766,6 +767,9 @@ async def reply_to_review(review_id: str, request: Request):
     
     if not reply_text:
         raise HTTPException(status_code=400, detail="Reply text required")
+    
+    if len(reply_text) > 2000:
+        raise HTTPException(status_code=400, detail="Reply too long (max 2000 characters)")
     
     reply_data = {
         "text": reply_text,

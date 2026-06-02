@@ -254,6 +254,7 @@ const CustomBuilderContent = () => {
               <div className="flex gap-4 mt-4">
                 <button
                   onClick={() => setSide('front')}
+                  data-testid="builder-side-front"
                   className={`flex-1 px-6 py-3 border ${
                     side === 'front'
                       ? 'border-white bg-white text-black'
@@ -264,6 +265,7 @@ const CustomBuilderContent = () => {
                 </button>
                 <button
                   onClick={() => setSide('back')}
+                  data-testid="builder-side-back"
                   className={`flex-1 px-6 py-3 border ${
                     side === 'back'
                       ? 'border-white bg-white text-black'
@@ -285,6 +287,7 @@ const CustomBuilderContent = () => {
                     <button
                       key={color.value}
                       onClick={() => setTshirtColor(color.value)}
+                      data-testid={`builder-color-${color.value}`}
                       className={`w-full aspect-square border-2 ${
                         tshirtColor === color.value ? 'border-white' : 'border-transparent'
                       } hover:border-white/50 transition-colors relative`}
@@ -315,6 +318,7 @@ const CustomBuilderContent = () => {
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
+                    data-testid="builder-upload-image-button"
                     className="w-full px-4 py-3 border border-white/20 bg-transparent text-white hover:bg-white/5 transition-colors uppercase text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {uploading ? (
@@ -332,6 +336,7 @@ const CustomBuilderContent = () => {
                   <button
                     onClick={addText}
                     disabled={uploading}
+                    data-testid="builder-add-text-button"
                     className="w-full px-4 py-3 border border-white/20 bg-transparent text-white hover:bg-white/5 transition-colors uppercase text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     <Type className="w-4 h-4" />
@@ -372,12 +377,14 @@ const CustomBuilderContent = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => resizeElement(selectedEl.id, -20)}
+                        data-testid="builder-resize-smaller"
                         className="px-3 py-2 border border-white/20 bg-transparent text-white hover:bg-white/5 transition-colors text-xs uppercase font-bold"
                       >
                         SMALLER
                       </button>
                       <button
                         onClick={() => resizeElement(selectedEl.id, 20)}
+                        data-testid="builder-resize-larger"
                         className="px-3 py-2 border border-white/20 bg-transparent text-white hover:bg-white/5 transition-colors text-xs uppercase font-bold"
                       >
                         LARGER
@@ -387,6 +394,7 @@ const CustomBuilderContent = () => {
                     <div className="flex gap-2">
                       <button
                         onClick={() => rotateElement(selectedEl.id)}
+                        data-testid="builder-rotate-button"
                         className="flex-1 px-4 py-2 border border-white/20 bg-transparent text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-2 text-sm"
                       >
                         <RotateCw className="w-4 h-4" />
@@ -394,6 +402,7 @@ const CustomBuilderContent = () => {
                       </button>
                       <button
                         onClick={() => deleteElement(selectedEl.id)}
+                        data-testid="builder-delete-button"
                         className="flex-1 px-4 py-2 border border-[#E60000]/50 bg-transparent text-[#E60000] hover:bg-[#E60000]/10 transition-colors flex items-center justify-center gap-2 text-sm"
                       >
                         <Trash2 className="w-4 h-4" />
