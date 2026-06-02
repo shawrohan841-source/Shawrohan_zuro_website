@@ -68,6 +68,8 @@ export const AuthProvider = ({ children }) => {
       console.error('Logout error:', error);
     } finally {
       setUser(null);
+      // Clear admin authentication on logout
+      localStorage.removeItem('admin_authenticated');
     }
   };
 

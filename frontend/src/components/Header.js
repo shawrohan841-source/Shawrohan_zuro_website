@@ -97,15 +97,6 @@ const Header = () => {
                       >
                         Profile
                       </Link>
-                      {user.role === 'admin' && (
-                        <Link
-                          to="/admin"
-                          data-testid="profile-menu-admin"
-                          className="block px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors"
-                        >
-                          Admin Dashboard
-                        </Link>
-                      )}
                       <button
                         data-testid="profile-menu-logout"
                         onClick={logout}

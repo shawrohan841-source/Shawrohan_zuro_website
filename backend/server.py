@@ -244,6 +244,38 @@ async def startup():
 
 # ==================== AUTH ROUTES ====================
 
+@api_router.post("/admin/auth/validate")
+async def validate_admin_master(request: Request):
+    """Validate the master admin password - hidden access gate"""
+    data = await request.json()
+    submitted_password = data.get("password", "")
+    master_password = os.environ.get("ADMIN_MASTER_PASSWORD", "")
+    
+    if not master_password:
+        raise HTTPException(status_code=500, detail="Admin access not configured")
+    
+    if submitted_password != master_password:
+        # Log unauthorized attempt
+        logger.warning(f"Failed admin gate attempt from IP: {request.client.host if request.client else 'unknown'}")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Auto-login as admin user
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@zuro.com")
+    admin_user = await db.users.find_one({"email": admin_email})
+    
+    if not admin_user:
+        raise HTTPException(status_code=500, detail="Admin user not found")
+    
+    user_id = str(admin_user["_id"])
+    access_token = create_access_token(user_id, admin_email)
+    refresh_token = create_refresh_token(user_id)
+    
+    response = JSONResponse(content={"success": True, "message": "Admin authenticated"})
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=900, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=False, samesite="lax", max_age=604800, path="/")
+    
+    return response
+
 @api_router.post("/auth/register", response_model=UserResponse)
 async def register(user: UserRegister, response: Response):
     email = user.email.lower()

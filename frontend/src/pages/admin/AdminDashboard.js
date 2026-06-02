@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../../components/Header';
-import { Package, ShoppingBag, Users, DollarSign, Ticket } from 'lucide-react';
+import { Package, ShoppingBag, Users, DollarSign, Ticket, LogOut } from 'lucide-react';
+import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,12 +27,33 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleAdminExit = async () => {
+    try {
+      await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('admin_authenticated');
+      toast.success('Admin session ended');
+      navigate('/');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050505]">
       <Header />
       <div className="pt-24 pb-16">
         <div className="container mx-auto px-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-tight uppercase font-bold text-white mb-8">ADMIN DASHBOARD</h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-tight uppercase font-bold text-white">ADMIN DASHBOARD</h1>
+            <button
+              onClick={handleAdminExit}
+              className="border border-[#E60000]/50 bg-transparent text-[#E60000] hover:bg-[#E60000]/10 rounded-none transition-colors uppercase tracking-widest font-bold text-sm px-6 py-3 flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              EXIT ADMIN
+            </button>
+          </div>
           {loading ? (
             <div className="text-white">Loading...</div>
           ) : (

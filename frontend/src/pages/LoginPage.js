@@ -23,12 +23,7 @@ const LoginPage = () => {
     const result = await login(email, password);
     if (result.success) {
       toast.success('Login successful!');
-      // Redirect based on role
-      if (result.user?.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/profile');
-      }
+      navigate('/profile');
     } else {
       toast.error(result.error);
     }
