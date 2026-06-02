@@ -300,30 +300,61 @@ const ProductDetailPage = () => {
 
           {/* Reviews Section */}
           <div className="mt-20">
-            <h2 className="text-2xl tracking-tight uppercase font-bold text-white mb-8">CUSTOMER REVIEWS</h2>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl tracking-tight uppercase font-bold text-white">CUSTOMER REVIEWS</h2>
+              {reviews.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-4 h-4 ${
+                          i < Math.round(averageRating) ? 'fill-[#E60000] text-[#E60000]' : 'text-[#A1A1AA]'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-white font-bold">{averageRating.toFixed(1)}</span>
+                  <span className="text-[#A1A1AA] text-sm">({reviews.length} reviews)</span>
+                </div>
+              )}
+            </div>
             {reviews.length === 0 ? (
-              <p className="text-[#A1A1AA]">No reviews yet. Be the first to review this product!</p>
+              <div className="bg-[#111111] border border-white/10 p-12 text-center">
+                <p className="text-[#A1A1AA]">No reviews yet. Be the first to review this product!</p>
+              </div>
             ) : (
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {reviews.map((review, i) => (
                   <div key={i} data-testid={`review-${i}`} className="bg-[#111111] border border-white/10 p-6">
                     <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className="text-white font-bold">{review.user_name}</p>
-                        <div className="flex items-center gap-1 mt-1">
-                          {[...Array(5)].map((_, j) => (
-                            <Star
-                              key={j}
-                              className={`w-3 h-3 ${
-                                j < review.rating ? 'fill-[#E60000] text-[#E60000]' : 'text-[#A1A1AA]'
-                              }`}
-                            />
-                          ))}
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#E60000]/20 flex items-center justify-center text-white font-bold uppercase">
+                          {review.user_name.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-white font-bold">{review.user_name}</p>
+                            {review.verified_purchase && (
+                              <span className="bg-[#E60000] text-white text-[10px] uppercase tracking-widest px-2 py-0.5">VERIFIED</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-[#A1A1AA]">{review.user_city || 'India'}</p>
+                          <div className="flex items-center gap-1 mt-1">
+                            {[...Array(5)].map((_, j) => (
+                              <Star
+                                key={j}
+                                className={`w-3 h-3 ${
+                                  j < review.rating ? 'fill-[#E60000] text-[#E60000]' : 'text-[#A1A1AA]'
+                                }`}
+                              />
+                            ))}
+                          </div>
                         </div>
                       </div>
-                      <span className="text-xs text-[#A1A1AA]">{new Date(review.created_at).toLocaleDateString()}</span>
+                      <span className="text-xs text-[#A1A1AA]">{new Date(review.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                     </div>
-                    <p className="text-[#A1A1AA] text-sm">{review.comment}</p>
+                    <p className="text-[#A1A1AA] text-sm leading-relaxed mt-3">{review.comment}</p>
                   </div>
                 ))}
               </div>

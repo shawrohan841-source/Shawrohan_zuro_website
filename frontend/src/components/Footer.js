@@ -40,10 +40,53 @@ const Footer = () => {
           <div>
             <h4 className="text-xs uppercase tracking-[0.2em] text-white mb-4 font-bold">Support</h4>
             <ul className="space-y-2">
-              <li className="text-[#A1A1AA] text-sm">Contact Us</li>
-              <li className="text-[#A1A1AA] text-sm">Shipping Policy</li>
-              <li className="text-[#A1A1AA] text-sm">Return Policy</li>
-              <li className="text-[#A1A1AA] text-sm">Size Guide</li>
+              <li>
+                <Link to="/contact" className="text-[#A1A1AA] text-sm hover:text-white transition-colors">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping" className="text-[#A1A1AA] text-sm hover:text-white transition-colors">
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/refund" className="text-[#A1A1AA] text-sm hover:text-white transition-colors">
+                  Return Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/size-guide" className="text-[#A1A1AA] text-sm hover:text-white transition-colors">
+                  Size Guide
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="text-[#A1A1AA] text-sm hover:text-white transition-colors">
+                  FAQ
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="text-xs uppercase tracking-[0.2em] text-white mb-4 font-bold">Legal</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/about" className="text-[#A1A1AA] text-sm hover:text-white transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-[#A1A1AA] text-sm hover:text-white transition-colors">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="text-[#A1A1AA] text-sm hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
             </ul>
           </div>
 

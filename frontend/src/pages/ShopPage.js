@@ -193,9 +193,25 @@ const ShopPage = () => {
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
-                          {product.featured && (
-                            <div className="absolute top-4 left-4 z-10 bg-[#E60000] text-white text-[10px] uppercase tracking-widest px-2 py-1">
-                              FEATURED
+                          <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                            {product.featured && (
+                              <div className="bg-[#E60000] text-white text-[10px] uppercase tracking-widest px-2 py-1">
+                                FEATURED
+                              </div>
+                            )}
+                            {product.badge && (
+                              <div className={`text-white text-[10px] uppercase tracking-widest px-2 py-1 ${
+                                product.badge === 'TRENDING' ? 'bg-[#FF6B00]' :
+                                product.badge === 'BEST SELLER' ? 'bg-[#00A651]' :
+                                'bg-[#FF0000] animate-pulse'
+                              }`}>
+                                {product.badge}
+                              </div>
+                            )}
+                          </div>
+                          {product.stock && product.stock < 20 && (
+                            <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-sm text-white text-[10px] uppercase tracking-widest px-2 py-1 text-center">
+                              Only {product.stock} left!
                             </div>
                           )}
                         </div>

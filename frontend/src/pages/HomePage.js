@@ -5,6 +5,7 @@ import Marquee from 'react-fast-marquee';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import TestimonialsSection from '../components/TestimonialsSection';
 import { ArrowRight, Truck, RefreshCw, Shield, Sparkles } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -145,9 +146,25 @@ const HomePage = () => {
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    {product.featured && (
-                      <div className="absolute top-4 left-4 z-10 bg-[#E60000] text-white text-[10px] uppercase tracking-widest px-2 py-1">
-                        FEATURED
+                    <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                      {product.featured && (
+                        <div className="bg-[#E60000] text-white text-[10px] uppercase tracking-widest px-2 py-1">
+                          FEATURED
+                        </div>
+                      )}
+                      {product.badge && (
+                        <div className={`text-white text-[10px] uppercase tracking-widest px-2 py-1 ${
+                          product.badge === 'TRENDING' ? 'bg-[#FF6B00]' :
+                          product.badge === 'BEST SELLER' ? 'bg-[#00A651]' :
+                          'bg-[#FF0000] animate-pulse'
+                        }`}>
+                          {product.badge}
+                        </div>
+                      )}
+                    </div>
+                    {product.stock && product.stock < 20 && (
+                      <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-sm text-white text-[10px] uppercase tracking-widest px-2 py-1 text-center">
+                        Only {product.stock} left!
                       </div>
                     )}
                   </div>
@@ -209,6 +226,9 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <TestimonialsSection />
 
       {/* WhatsApp Float Button */}
       <a
