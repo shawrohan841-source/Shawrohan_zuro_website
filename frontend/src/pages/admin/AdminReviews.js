@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from '../../components/Header';
-import { Check, X, Star, Eye, EyeOff, Trash2, Award } from 'lucide-react';
+import { Check, X, Star, EyeOff, Trash2, Award, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -10,6 +10,8 @@ const AdminReviews = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState('');
 
   useEffect(() => {
     fetchReviews();
@@ -29,7 +31,7 @@ const AdminReviews = () => {
   const handleModerate = async (reviewId, action) => {
     try {
       await axios.put(`${API}/admin/reviews/${reviewId}/moderate?action=${action}`, {}, { withCredentials: true });
-      toast.success(`Review ${action}d successfully`);
+      toast.success(action === 'feature' ? 'Review featured! Email sent to customer.' : `Review ${action}d successfully`);
       fetchReviews();
     } catch (error) {
       toast.error('Failed to moderate review');
@@ -44,6 +46,37 @@ const AdminReviews = () => {
       fetchReviews();
     } catch (error) {
       toast.error('Failed to delete review');
+    }
+  };
+
+  const handleReplySubmit = async (reviewId) => {
+    if (!replyText.trim()) {
+      toast.error('Please enter a reply');
+      return;
+    }
+    try {
+      await axios.post(
+        `${API}/admin/reviews/${reviewId}/reply`,
+        { reply: replyText },
+        { withCredentials: true }
+      );
+      toast.success('Reply added');
+      setReplyingTo(null);
+      setReplyText('');
+      fetchReviews();
+    } catch (error) {
+      toast.error('Failed to add reply');
+    }
+  };
+
+  const handleDeleteReply = async (reviewId) => {
+    if (!window.confirm('Delete this reply?')) return;
+    try {
+      await axios.delete(`${API}/admin/reviews/${reviewId}/reply`, { withCredentials: true });
+      toast.success('Reply deleted');
+      fetchReviews();
+    } catch (error) {
+      toast.error('Failed to delete reply');
     }
   };
 
@@ -194,12 +227,74 @@ const AdminReviews = () => {
                           key={j}
                           src={img}
                           alt="Review"
+                          loading="lazy"
                           className="w-20 h-20 object-cover border border-white/10 cursor-pointer hover:border-white/30 transition-colors"
                           onClick={() => window.open(img, '_blank')}
                         />
                       ))}
                     </div>
                   )}
+
+                  {/* Admin Reply Section */}
+                  {review.admin_reply ? (
+                    <div className="mt-4 bg-[#E60000]/5 border-l-2 border-[#E60000] p-4">
+                      <div className="flex justify-between items-start mb-1">
+                        <p className="text-xs uppercase tracking-[0.2em] text-[#E60000] font-bold">
+                          ZURO REPLY · {review.admin_reply.admin_name}
+                        </p>
+                        <button
+                          onClick={() => handleDeleteReply(review.id)}
+                          className="text-[#A1A1AA] hover:text-[#E60000] transition-colors"
+                          title="Delete reply"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <p className="text-white text-sm">{review.admin_reply.text}</p>
+                      <p className="text-xs text-[#A1A1AA] mt-2">
+                        {new Date(review.admin_reply.created_at).toLocaleDateString('en-IN')}
+                      </p>
+                    </div>
+                  ) : replyingTo === review.id ? (
+                    <div className="mt-4 bg-[#1A1A1A] border border-white/10 p-4">
+                      <textarea
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder="Write your reply..."
+                        rows={3}
+                        className="w-full bg-[#050505] border border-white/10 rounded-none px-3 py-2 text-white text-sm focus:border-white focus:outline-none resize-none"
+                      />
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={() => handleReplySubmit(review.id)}
+                          className="bg-white text-black hover:bg-gray-200 transition-colors uppercase tracking-widest font-bold text-xs px-4 py-2"
+                        >
+                          SEND REPLY
+                        </button>
+                        <button
+                          onClick={() => {
+                            setReplyingTo(null);
+                            setReplyText('');
+                          }}
+                          className="border border-white/20 bg-transparent text-white hover:bg-white/5 transition-colors uppercase tracking-widest font-bold text-xs px-4 py-2"
+                        >
+                          CANCEL
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setReplyingTo(review.id);
+                        setReplyText('');
+                      }}
+                      className="mt-4 text-[#A1A1AA] hover:text-white transition-colors text-xs uppercase tracking-widest flex items-center gap-2"
+                    >
+                      <MessageSquare className="w-3 h-3" />
+                      Reply to Customer
+                    </button>
+                  )}
+
                   <p className="text-xs text-[#A1A1AA] mt-3">Product ID: {review.product_id}</p>
                 </div>
               ))}

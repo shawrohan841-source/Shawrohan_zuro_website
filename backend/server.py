@@ -17,6 +17,7 @@ import razorpay
 import resend
 import asyncio
 import requests
+from bson import ObjectId
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -724,7 +725,72 @@ async def moderate_review(review_id: str, action: str, request: Request):
     result = await db.reviews.update_one({"id": review_id}, {"$set": update})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Review not found")
+    
+    # Send email notification when review is featured (best-effort, non-blocking)
+    if action == "feature":
+        try:
+            review = await db.reviews.find_one({"id": review_id})
+            if review:
+                user = await db.users.find_one({"_id": ObjectId(review["user_id"])}) if review.get("user_id") else None
+                if user and user.get("email") and resend.api_key:
+                    try:
+                        resend.Emails.send({
+                            "from": SENDER_EMAIL,
+                            "to": user["email"],
+                            "subject": "🌟 Your ZURO review is now featured!",
+                            "html": f"""
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #050505; color: #fff; padding: 40px;">
+                                <h1 style="color: #fff; text-transform: uppercase; letter-spacing: 4px;">ZURO</h1>
+                                <h2 style="color: #E60000;">Your review is now FEATURED!</h2>
+                                <p>Hi {user.get('name', 'Customer')},</p>
+                                <p>Great news! Your review has been featured by our team. It will now be highlighted on the product page for other customers to see.</p>
+                                <p style="background: #111; padding: 20px; border-left: 3px solid #E60000;">"{review.get('comment', '')}"</p>
+                                <p>Thank you for being part of the ZURO family!</p>
+                                <p style="color: #888;">- The ZURO Team</p>
+                            </div>
+                            """
+                        })
+                    except Exception as e:
+                        logger.warning(f"Failed to send featured review email: {e}")
+        except Exception as e:
+            logger.warning(f"Featured email notification error: {e}")
+    
     return {"message": f"Review {action}d"}
+
+@api_router.post("/admin/reviews/{review_id}/reply")
+async def reply_to_review(review_id: str, request: Request):
+    """Admin reply to a customer review"""
+    user = await get_admin_user(request)
+    data = await request.json()
+    reply_text = data.get("reply", "").strip()
+    
+    if not reply_text:
+        raise HTTPException(status_code=400, detail="Reply text required")
+    
+    reply_data = {
+        "text": reply_text,
+        "admin_name": user.get("name", "ZURO Team"),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    result = await db.reviews.update_one(
+        {"id": review_id},
+        {"$set": {"admin_reply": reply_data}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return {"message": "Reply added", "reply": reply_data}
+
+@api_router.delete("/admin/reviews/{review_id}/reply")
+async def delete_review_reply(review_id: str, request: Request):
+    await get_admin_user(request)
+    result = await db.reviews.update_one(
+        {"id": review_id},
+        {"$unset": {"admin_reply": ""}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return {"message": "Reply deleted"}
 
 # ==================== COUPONS ====================
 

@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 import { Heart, Star, ShoppingCart, Minus, Plus, X } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { compressImage } from '../utils/imageCompression';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -72,9 +73,11 @@ const ProductDetailPage = () => {
     const files = Array.from(e.target.files).slice(0, 4);
     const uploaded = [];
     for (const file of files) {
-      const formData = new FormData();
-      formData.append('file', file);
       try {
+        // Compress image before upload for faster performance
+        const compressed = await compressImage(file, 1200, 0.85).catch(() => file);
+        const formData = new FormData();
+        formData.append('file', compressed);
         const { data } = await axios.post(`${API}/storage/upload`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
           withCredentials: true,
@@ -608,10 +611,19 @@ const ProductDetailPage = () => {
                             key={j}
                             src={img}
                             alt="Review"
+                            loading="lazy"
                             className="w-20 h-20 object-cover border border-white/10 cursor-pointer hover:border-white/30 transition-colors"
                             onClick={() => window.open(img, '_blank')}
                           />
                         ))}
+                      </div>
+                    )}
+                    {review.admin_reply && (
+                      <div className="mt-4 bg-[#E60000]/5 border-l-2 border-[#E60000] p-4">
+                        <p className="text-xs uppercase tracking-[0.2em] text-[#E60000] font-bold mb-2">
+                          ZURO REPLY
+                        </p>
+                        <p className="text-white text-sm leading-relaxed">{review.admin_reply.text}</p>
                       </div>
                     )}
                   </div>
