@@ -1,0 +1,99 @@
+{
+  "brand_name": "ZURO",
+  "theme": "dark",
+  "archetype": "5 (Luxury)",
+  "vibe": "Black luxury streetwear, anime-inspired fashion, high-end minimal premium",
+  "global_styles": {
+    "background_color": "#050505",
+    "surface_color": "#111111",
+    "surface_elevated": "#1A1A1A",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "#A1A1AA",
+    "accent_color": "#E60000",
+    "border_color": "rgba(255, 255, 255, 0.1)"
+  },
+  "typography": {
+    "heading_font": "Unbounded",
+    "body_font": "Satoshi",
+    "fallback_heading": "sans-serif",
+    "fallback_body": "sans-serif",
+    "scale": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter uppercase font-black",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight uppercase font-bold",
+      "h3": "text-xl sm:text-2xl tracking-tight font-bold",
+      "body": "text-base leading-relaxed text-[#A1A1AA]",
+      "label": "text-xs tracking-[0.2em] uppercase text-[#A1A1AA]"
+    }
+  },
+  "layout_spacing": {
+    "philosophy": "Generous spacing. Asymmetric grids for marketing, dense 'Control Room' grids for builder and admin.",
+    "container_padding": "p-6 md:p-12 lg:p-24",
+    "grid_gap": "gap-8 md:gap-12"
+  },
+  "surface_strategies": {
+    "cards": "Flat solid background #111111, 1px border border-white/10, no default shadow. Hover: slight translate-y-1, border-white/30, subtle white glow drop-shadow-[0_0_15px_rgba(255,255,255,0.05)].",
+    "header": "Crystal Glass: bg-black/60 backdrop-blur-xl backdrop-saturate-150 border-b border-white/10",
+    "buttons": "Primary: bg-white text-black rounded-none hover:bg-gray-200 transition-colors uppercase tracking-widest font-bold text-sm px-8 py-4. Secondary: border border-white/20 bg-transparent text-white hover:bg-white/5",
+    "admin_dashboard": "Control Room Grid. Sharp edges (rounded-none). Dense layout, 1px solid borders border-white/10. Dark mode background.",
+    "builder_interface": "Split screen layout. Canvas on left, sticky controls on right. Technical 'retro-futurism' look for sliders and toggles."
+  },
+  "components": {
+    "hero": "Full screen height. Overlay image with bg-gradient-to-t from-[#050505] via-[#050505]/50 to-transparent. Massive typography aligned bottom-left or center.",
+    "product_grid": "Image dominates 85% of card space. Minimal text (Product Name, Price) aligned left below image.",
+    "marquee": "Use react-fast-marquee. Massive outline text 'PREMIUM ANIME STREETWEAR' in text-8xl text-transparent font-black uppercase whitespace-nowrap opacity-10.",
+    "filters": "Sidebar filter. Checkboxes with minimal styling, custom Shadcn Select for sorting.",
+    "forms": "Inputs: bg-[#111111] border-white/10 rounded-none focus:border-white focus:ring-0 text-white placeholder-gray-600.",
+    "badges": "bg-[#E60000] text-white text-[10px] uppercase tracking-widest px-2 py-1 absolute top-4 left-4 z-10"
+  },
+  "media": {
+    "images": [
+      {
+        "category": "hero",
+        "url": "https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHwxfHxzdHJlZXR3ZWFyJTIwaG9vZGllJTIwbW9kZWwlMjBkYXJrfGVufDB8fHx8MTc4MDM5MDA0MHww&ixlib=rb-4.1.0&q=85",
+        "description": "Person in brown hoodie and black pants standing on staircase - use for main hero banner with dark overlay"
+      },
+      {
+        "category": "product_hoodie",
+        "url": "https://images.pexels.com/photos/33562235/pexels-photo-33562235.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Fashionable man in hoodie and jacket posing at night"
+      },
+      {
+        "category": "product_hoodie_2",
+        "url": "https://images.pexels.com/photos/28523141/pexels-photo-28523141.png?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Model wearing a black hoodie with floral skull design"
+      },
+      {
+        "category": "product_tshirt",
+        "url": "https://images.unsplash.com/photo-1661110546797-d86cc72a2765?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHw0fHxvdmVyc2l6ZWQlMjBzdHJlZXR3ZWFyJTIwYW5pbWUlMjB0LXNoaXJ0JTIwbW9kZWx8ZW58MHx8fHwxNzgwMzkwMDQwfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Woman wearing oversized black t-shirt"
+      },
+      {
+        "category": "product_tshirt_2",
+        "url": "https://images.unsplash.com/photo-1593726891090-b4c6bc09c819?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwyfHxvdmVyc2l6ZWQlMjBzdHJlZXR3ZWFyJTIwYW5pbWUlMjB0LXNoaXJ0JTIwbW9kZWx8ZW58MHx8fHwxNzgwMzkwMDQwfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Man in black and red floral t-shirt"
+      },
+      {
+        "category": "brand_texture",
+        "url": "https://images.pexels.com/photos/28504904/pexels-photo-28504904.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Detailed photo of fashion labels and logos on textured fabric - good for about/brand section"
+      }
+    ]
+  },
+  "interactions": {
+    "hover": "High contrast shifts. Text elements turn pure white on hover. Images scale slightly.",
+    "animations": "Use Framer Motion for page transitions and staggering lists. Elements should fade in and slide up slightly. Keep it premium, not jumpy.",
+    "accessibility": "Always ensure 4.5:1 contrast ratio. Focus states must have white ring 2px offset."
+  },
+  "instructions_to_main_agent": [
+    "Build the application using pure React/Tailwind for marketing and Shadcn components for complex interactions like dropdowns or admin dashboard.",
+    "Do not use card components with soft shadows. Strictly adhere to the dark, high-contrast, flat aesthetic.",
+    "Import Unbounded and Satoshi fonts from Google Fonts or local font sources.",
+    "Implement the Custom T-Shirt Builder utilizing a technical, precise layout with raw inputs and clear visual canvas.",
+    "Implement Admin Dashboard utilizing strict grid structure, full screen height, and data-dense tables.",
+    "Remember to include data-testid for all interactive elements.",
+    "Do NOT use placeholder images. Rely exclusively on the media URLs provided here.",
+    "Install lenis for smooth momentum scrolling.",
+    "Install framer-motion for UI animations and micro-interactions.",
+    "Install @phosphor-icons/react or lucide-react for sharp, modern icons."
+  ]
+}
