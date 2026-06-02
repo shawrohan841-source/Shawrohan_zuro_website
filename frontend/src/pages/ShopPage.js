@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { ProductCardSkeleton } from '../components/Skeleton';
 import { SlidersHorizontal, X } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -169,8 +170,10 @@ const ShopPage = () => {
             {/* Products Grid */}
             <div className="flex-1">
               {loading ? (
-                <div className="text-center py-20">
-                  <div className="text-white text-xl font-heading uppercase tracking-wider">Loading...</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[...Array(6)].map((_, i) => (
+                    <ProductCardSkeleton key={i} />
+                  ))}
                 </div>
               ) : products.length === 0 ? (
                 <div className="text-center py-20">

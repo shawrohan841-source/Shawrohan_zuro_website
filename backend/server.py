@@ -594,6 +594,58 @@ async def validate_coupon(coupon: CouponValidate):
     
     return {"discount": discount, "final_total": coupon.total - discount}
 
+@api_router.get("/admin/coupons")
+async def get_admin_coupons(request: Request):
+    await get_admin_user(request)
+    coupons = await db.coupons.find({}, {"_id": 0}).to_list(100)
+    return coupons
+
+@api_router.post("/admin/coupons")
+async def create_coupon(request: Request):
+    await get_admin_user(request)
+    data = await request.json()
+    coupon_doc = {
+        "id": str(uuid.uuid4()),
+        "code": data["code"].upper(),
+        "discount_percent": data.get("discount_percent", 0),
+        "discount_amount": data.get("discount_amount", 0),
+        "expiry_date": data["expiry_date"],
+        "active": data.get("active", True),
+        "used_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.coupons.insert_one(coupon_doc)
+    return {"message": "Coupon created", "id": coupon_doc["id"]}
+
+@api_router.put("/admin/coupons/{coupon_id}")
+async def update_coupon(coupon_id: str, request: Request):
+    await get_admin_user(request)
+    data = await request.json()
+    update_data = {}
+    if "code" in data:
+        update_data["code"] = data["code"].upper()
+    if "discount_percent" in data:
+        update_data["discount_percent"] = data["discount_percent"]
+    if "discount_amount" in data:
+        update_data["discount_amount"] = data["discount_amount"]
+    if "expiry_date" in data:
+        update_data["expiry_date"] = data["expiry_date"]
+    if "active" in data:
+        update_data["active"] = data["active"]
+    
+    result = await db.coupons.update_one({"id": coupon_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Coupon not found")
+    return {"message": "Coupon updated"}
+
+@api_router.delete("/admin/coupons/{coupon_id}")
+async def delete_coupon(coupon_id: str, request: Request):
+    await get_admin_user(request)
+    result = await db.coupons.delete_one({"id": coupon_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Coupon not found")
+    return {"message": "Coupon deleted"}
+
 # ==================== ADMIN ROUTES ====================
 
 @api_router.get("/admin/dashboard")

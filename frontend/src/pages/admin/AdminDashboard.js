@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../../components/Header';
-import { Package, ShoppingBag, Users, DollarSign } from 'lucide-react';
+import { Package, ShoppingBag, Users, DollarSign, Ticket } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -51,7 +51,7 @@ const AdminDashboard = () => {
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <Link to="/admin/products" className="bg-[#111111] border border-white/10 p-8 hover:border-white/30 transition-all hover:-translate-y-1">
                   <ShoppingBag className="w-10 h-10 text-white mb-4" />
                   <h2 className="text-xl uppercase font-bold text-white">MANAGE PRODUCTS</h2>
@@ -61,6 +61,11 @@ const AdminDashboard = () => {
                   <Package className="w-10 h-10 text-white mb-4" />
                   <h2 className="text-xl uppercase font-bold text-white">MANAGE ORDERS</h2>
                   <p className="text-[#A1A1AA] text-sm mt-2">View and update order status</p>
+                </Link>
+                <Link to="/admin/coupons" className="bg-[#111111] border border-white/10 p-8 hover:border-white/30 transition-all hover:-translate-y-1">
+                  <Ticket className="w-10 h-10 text-white mb-4" />
+                  <h2 className="text-xl uppercase font-bold text-white">MANAGE COUPONS</h2>
+                  <p className="text-[#A1A1AA] text-sm mt-2">Create and manage discount coupons</p>
                 </Link>
               </div>
             </>

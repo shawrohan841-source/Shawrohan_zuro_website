@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { OrderCardSkeleton } from '../components/Skeleton';
 import { useAuth } from '../contexts/AuthContext';
 import { Package } from 'lucide-react';
 
@@ -46,7 +47,11 @@ const ProfilePage = () => {
             <div className="lg:col-span-2">
               <h2 className="text-xl uppercase font-bold text-white mb-4">ORDER HISTORY</h2>
               {loading ? (
-                <div className="text-center py-10"><div className="text-white">Loading orders...</div></div>
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <OrderCardSkeleton key={i} />
+                  ))}
+                </div>
               ) : orders.length === 0 ? (
                 <div className="bg-[#111111] border border-white/10 p-8 text-center">
                   <Package className="w-12 h-12 text-[#A1A1AA] mx-auto mb-4" />
